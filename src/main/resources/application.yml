@@ -3,7 +3,16 @@ server:
 spring:
   application:
     name: book-service
+  datasource:
+    username: admin
+    password: admin
+    url: jdbc:postgresql://localhost:5432/book-service
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8081/eureka
+
+apiGatewayAddress: http://localhost:8082

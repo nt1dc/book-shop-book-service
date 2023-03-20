@@ -12,5 +12,8 @@ data class Book(
     val name: String,
     @OneToMany
     @JoinColumn(name = "book_id")
-    val items: MutableSet<Item>
+    val items: MutableSet<Item>,
+    val length: Int,
+    val width: Int,
+    val height: Int
 )

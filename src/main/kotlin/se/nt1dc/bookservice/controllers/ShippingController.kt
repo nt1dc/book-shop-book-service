@@ -12,6 +12,8 @@ import se.nt1dc.bookservice.service.ShippingService
 class ShippingController(val shippingService: ShippingService, val itemService: ItemService) {
     @GetMapping()
     fun calculateShippingPrice(orderDto: OrderDto): Double? {
-        return shippingService.calculateShipping(itemService.findItemsByBookIdList(orderDto.bookOrderList), orderDto.to)
+        return shippingService.calculateShipping(itemService.findItemsByBookIdList(orderDto.bookOrderList),
+            orderDto.to
+        )
     }
 }

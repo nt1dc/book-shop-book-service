@@ -7,13 +7,13 @@ data class Book(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int,
-    val name: String,
-    @OneToMany
+    var name: String,
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "book_id")
-    val items: MutableSet<Item>,
-    val length: Int,
-    val width: Int,
-    val height: Int,
-    val weight: Int,
-    val price: Double
+    var items: MutableList<Item> = mutableListOf(),
+    var length: Int,
+    var width: Int,
+    var height: Int,
+    var weight: Int,
+    var price: Double
 )

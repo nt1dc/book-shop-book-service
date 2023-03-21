@@ -3,23 +3,21 @@ package se.nt1dc.bookservice.service
 import jakarta.transaction.Transactional
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
+import se.nt1dc.bookservice.dto.ItemShippingDto
+import se.nt1dc.bookservice.dto.ItemShippingReq
 import se.nt1dc.bookservice.exceptions.ForeingServerRequestException
-import se.nt1dc.bookservice.dto.ItemShippingRequest
 import se.nt1dc.bookservice.dto.LocationDto
 import se.nt1dc.bookservice.entity.Item
-import se.nt1dc.bookservice.repository.BookRepository
 
 @Service
 @Transactional
 class ShippingServiceImpl(
-    val bookRepository: BookRepository,
-    val requestSender: RequestSender,
-    val itemService: ItemService
+    val requestSender: RequestSender
 ) : ShippingService {
 
     override fun calculateShipping(items: MutableList<Item>?, to: LocationDto): Double? {
         val itemShipRequest = items?.stream()?.map {
-            ItemShippingRequest(
+            ItemShippingDto(
                 LocationDto(it.stock.location.latitude, it.stock.location.longitude),
                 to,
                 it.book.length,
@@ -29,8 +27,8 @@ class ShippingServiceImpl(
             )
         }?.toList()
         val shipPriceSumResponse =
-            requestSender.sendReq("delivery-service/calculate", itemShipRequest!!, HttpMethod.GET)
-        if (shipPriceSumResponse.statusCode.is2xxSuccessful) return shipPriceSumResponse.body as Double
+            requestSender.sendReq("/delivery-service/calculate", ItemShippingReq(itemShipRequest), HttpMethod.POST)
+        if (shipPriceSumResponse.statusCode.is2xxSuccessful) return shipPriceSumResponse.body?.toDouble()
         throw ForeingServerRequestException(shipPriceSumResponse)
     }
 

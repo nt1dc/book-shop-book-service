@@ -13,6 +13,7 @@ data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int,
+    var email: String,
     @OneToMany(mappedBy = "user")
     var orders: MutableList<Order>
 )

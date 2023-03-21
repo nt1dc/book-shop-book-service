@@ -1,6 +1,6 @@
 package se.nt1dc.bookservice.dto
 
-data class ItemShippingRequest(
+data class ItemShippingDto(
     var from: LocationDto,
     var to: LocationDto,
     val length: Int,

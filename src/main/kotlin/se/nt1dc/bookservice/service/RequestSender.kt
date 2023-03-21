@@ -14,8 +14,8 @@ class RequestSender {
 
     @Value("\${apiGatewayAddress}")
     lateinit var apiGateWayAddress: String
-    fun sendReq(url: String, body: Any?, httpMethod: HttpMethod): ResponseEntity<Any> {
-        return restTemplate.exchange(URI(apiGateWayAddress + url), httpMethod, HttpEntity(body as Any), body.javaClass)
+    fun sendReq(url: String, body: Any?, httpMethod: HttpMethod): ResponseEntity<String> {
+        return restTemplate.exchange(URI(apiGateWayAddress + url), httpMethod, HttpEntity(body as Any), String::class.java)
     }
 
     fun sendReqWithoutBody(url: String, httpMethod: HttpMethod): ResponseEntity<String> {

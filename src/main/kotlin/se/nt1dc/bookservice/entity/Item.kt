@@ -9,10 +9,8 @@ data class Item(
     var id: Int,
     @ManyToOne
     val book: Book,
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "stock_id")
     val stock: Stock,
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    var order: Order
+    var available: Boolean = true
 )

@@ -10,6 +10,6 @@ data class Location(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int,
-    var latitude: Long,
-    var longitude: Long,
+    var latitude: Double,
+    var longitude: Double,
 )

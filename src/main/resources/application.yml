@@ -1,12 +1,13 @@
 server:
-  port: 0
+#  port: 0
+  port: 8080
 spring:
   application:
     name: book-service
   datasource:
     username: admin
     password: admin
-    url: jdbc:postgresql://localhost:5432/book-service
+    url: jdbc:postgresql://localhost:5430/book-service
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

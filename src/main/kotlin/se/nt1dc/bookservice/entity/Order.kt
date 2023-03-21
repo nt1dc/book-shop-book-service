@@ -11,7 +11,8 @@ data class Order(
     var id: Int? = null,
     @Enumerated(EnumType.STRING)
     var status: OrderStatus,
-    @OneToMany(mappedBy = "order")
+    @OneToMany(cascade = [CascadeType.ALL])
+    @JoinColumn(name = "order_id")
     var items: MutableList<Item>?,
     @ManyToOne()
     @JoinColumn(name = "user_id")

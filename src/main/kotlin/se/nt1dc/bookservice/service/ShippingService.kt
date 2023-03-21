@@ -5,6 +5,6 @@ import se.nt1dc.bookservice.dto.OrderDto
 
 @Service
 interface ShippingService {
-    fun calculateShipping(orderDto: OrderDto): String?
+    fun calculateShipping(orderDto: OrderDto): Double?
 
 }

@@ -2,40 +2,41 @@ package se.nt1dc.bookservice.service
 
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
-import se.nt1dc.bookservice.dao.BookWithCount
+import se.nt1dc.bookservice.ForeingServerRequestException
+import se.nt1dc.bookservice.dto.BookWithCount
 import se.nt1dc.bookservice.dto.ItemShippingRequest
+import se.nt1dc.bookservice.dto.LocationDto
 import se.nt1dc.bookservice.dto.OrderDto
 import se.nt1dc.bookservice.repository.BookRepository
 
 @Service
-@Transactional()
-class ShippingServiceImpl(val bookRepository: BookRepository, val requestSender: RequestSender) : ShippingService {
-    override fun calculateShipping(orderDto: OrderDto): String? {
-        val books = orderDto.bookOrderList.stream()
-            .map { book -> BookWithCount(bookRepository.findByName(book.bookName), book.count) }.toList()
-        val locationWithSize = HashMap<String, Int>()
-        for (bookReq in books) {
-            var c = bookReq.count
-            for (item in bookReq.book.items.sortedBy { it.count }) {
-                if (item.count > 0) {
-                    val tmp = c
-                    if (item.count >= c) {
-                        item.count -= c
-                        c = 0
-                    } else {
-                        c -= item.count
-                        item.count = 0
-                    }
-                    locationWithSize[item.stock.location] = locationWithSize.getOrDefault(item.stock.location, 0)
-                    +item.book.height * item.book.width * item.book.length * tmp - c
+@Transactional
+class ShippingServiceImpl(
+    val bookRepository: BookRepository,
+    val requestSender: RequestSender,
+) : ShippingService {
+
+    override fun calculateShipping(orderDto: OrderDto): Double? {
+        val itemShipRequest = orderDto.bookOrderList.stream().map { book ->
+            BookWithCount(bookRepository.findById(book.bookId).orElseThrow { throw RuntimeException() }, book.count)
+        }.map { bookWithCount ->
+            if (bookWithCount.book.items.size < bookWithCount.count) throw RuntimeException(
+                bookWithCount.book.name + " доступно только " + bookWithCount.book.items.size + " из" + bookWithCount.count
+            )
+            bookWithCount.book.items.stream().limit(bookWithCount.count.toLong())
+                .map {
+                    ItemShippingRequest(
+                        LocationDto(it.stock.location.latitude, it.stock.location.longitude),
+                        orderDto.to,
+                        it.book.length,
+                        it.book.width,
+                        it.book.height,
+                        it.book.weight
+                    )
                 }
-                if (c == 0) break
-            }
-            if (c > 0) throw Exception(bookReq.book.name + " доступно только " + (bookReq.count - c) + " из" + bookReq.count)
-        }
-        var itemShippingList =
-            locationWithSize.map { m -> ItemShippingRequest(m.key, orderDto.destinationAddress, m.value) }.toList()
-        val sendReq = requestSender.sendReq("delivery-service", itemShippingList)
-        return sendReq.body
+        }.toList()
+        val shipPriceSumResponse = requestSender.sendReq("delivery-service/calculate", itemShipRequest)
+        if (shipPriceSumResponse.statusCode.is2xxSuccessful) return shipPriceSumResponse.body as Double
+        throw ForeingServerRequestException(shipPriceSumResponse)
     }
 }

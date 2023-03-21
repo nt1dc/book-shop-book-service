@@ -1,14 +1,14 @@
 package se.nt1dc.bookservice.entity
 
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.OneToMany
+import jakarta.persistence.*
 
 @Entity
 data class Stock(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int,
-    var location: String,
+    @OneToOne
+    var location: Location,
     @OneToMany(mappedBy = "stock")
     var items: Set<Item>
 )

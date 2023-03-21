@@ -1,4 +1,4 @@
-package se.nt1dc.bookservice.dao
+package se.nt1dc.bookservice.dto
 
 import se.nt1dc.bookservice.entity.Book
 

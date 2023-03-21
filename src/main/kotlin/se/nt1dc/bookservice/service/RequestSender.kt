@@ -1,5 +1,6 @@
 package se.nt1dc.bookservice.service
 
+import org.aspectj.apache.bcel.classfile.JavaClass
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
@@ -14,7 +15,7 @@ class RequestSender {
 
     @Value("\${apiGatewayAddress}")
     lateinit var apiGateWayAddress: String
-    fun sendReq(url: String, body: Any): ResponseEntity<String> {
-        return restTemplate.exchange(URI(apiGateWayAddress + url), HttpMethod.GET, HttpEntity(body), String::class.java)
+    fun sendReq(url: String, body: Any): ResponseEntity<Any> {
+        return restTemplate.exchange(URI(apiGateWayAddress + url), HttpMethod.GET, HttpEntity(body), body.javaClass)
     }
 }

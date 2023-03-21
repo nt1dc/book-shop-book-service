@@ -1,13 +1,11 @@
 package se.nt1dc.bookservice.entity
 
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.OneToMany
+import jakarta.persistence.*
 
 @Entity
 data class Book(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int,
     val name: String,
     @OneToMany
@@ -15,5 +13,6 @@ data class Book(
     val items: MutableSet<Item>,
     val length: Int,
     val width: Int,
-    val height: Int
+    val height: Int,
+    val weight: Int
 )

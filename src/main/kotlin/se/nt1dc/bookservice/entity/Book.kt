@@ -14,5 +14,6 @@ data class Book(
     val length: Int,
     val width: Int,
     val height: Int,
-    val weight: Int
+    val weight: Int,
+    val price: Double
 )

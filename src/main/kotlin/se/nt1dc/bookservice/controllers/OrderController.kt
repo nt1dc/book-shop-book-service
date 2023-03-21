@@ -1,16 +1,28 @@
 package se.nt1dc.bookservice.controllers
 
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import se.nt1dc.bookservice.dto.OrderDto
-import se.nt1dc.bookservice.service.ShippingService
+import se.nt1dc.bookservice.service.OrderService
 
 @RestController
-@RequestMapping("order")
-class OrderController(val shippingService: ShippingService) {
-    @GetMapping
-    fun calculateShippingPrice(orderDto: OrderDto): Double? {
-        return shippingService.calculateShipping(orderDto)
+@RequestMapping("/order")
+class OrderController(
+    val orderService: OrderService
+) {
+
+
+    @PostMapping("")
+    fun createOrder(orderDto: OrderDto, userId: Int) {
+        orderService.createOrder(orderDto, userId);
+    }
+
+    @GetMapping("/pay/{orderId}")
+    fun getOrder(@PathVariable orderId: Int): String {
+        return orderService.pay(orderId)
+    }
+
+    @GetMapping("/updateStatus/{orderId}")
+    fun updateOrderStatus(@PathVariable orderId: Int) {
+        orderService.updateStatus(orderId)
     }
 }

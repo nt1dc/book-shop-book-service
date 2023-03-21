@@ -8,12 +8,13 @@ import jakarta.persistence.*
 data class Order(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int,
+    var id: Int? = null,
     @Enumerated(EnumType.STRING)
     var status: OrderStatus,
     @OneToMany(mappedBy = "order")
-    var items: List<Item>,
+    var items: MutableList<Item>?,
     @ManyToOne()
     @JoinColumn(name = "user_id")
-    var user: User
+    var user: User,
+    var paymentId: Int
 )

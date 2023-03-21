@@ -14,5 +14,5 @@ data class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int,
     @OneToMany(mappedBy = "user")
-    var orders: List<Order>
+    var orders: MutableList<Order>
 )

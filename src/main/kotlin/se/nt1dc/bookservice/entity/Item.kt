@@ -12,5 +12,5 @@ data class Item(
     @ManyToOne
     @JoinColumn(name = "stock_id")
     val stock: Stock,
-    var available: Boolean = true
+    var available: Boolean = true,
 )

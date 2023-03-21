@@ -41,7 +41,7 @@ class OrderService(
         val createPaymentOrderResp = objectMapper.readValue(responseEntity.body, CreatePaymentOrderResp::class.java)
         val order = Order(
             status = OrderStatus.CREATED,
-            items = items,
+            items = items!!,
             user = user,
             paymentId = createPaymentOrderResp.paymentOrderId
         )
@@ -49,7 +49,7 @@ class OrderService(
         user.orders.add(
             order
         )
-        items?.stream()?.forEach { it.available = false }
+        items.stream().forEach { it.available = false }
         val saveAndFlush = userRepository.saveAndFlush(user)
         return saveAndFlush.id
     }

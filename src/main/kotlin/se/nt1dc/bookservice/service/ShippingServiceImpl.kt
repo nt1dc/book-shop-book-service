@@ -12,18 +12,18 @@ import se.nt1dc.bookservice.entity.Item
 @Service
 @Transactional
 class ShippingServiceImpl(
-    val requestSender: RequestSender
+    private val requestSender: RequestSender
 ) : ShippingService {
 
-    override fun calculateShipping(items: MutableList<Item>?, to: LocationDto): Double? {
+    override fun calculateShipping(items: MutableList<Item>?, to: LocationDto?): Double? {
         val itemShipRequest = items?.stream()?.map {
             ItemShippingDto(
                 LocationDto(it.stock.location.latitude, it.stock.location.longitude),
                 to,
-                it.book.length,
-                it.book.width,
-                it.book.height,
-                it.book.weight
+                it.physicalBook.length,
+                it.physicalBook.width,
+                it.physicalBook.height,
+                it.physicalBook.weight
             )
         }?.toList()
         val shipPriceSumResponse =

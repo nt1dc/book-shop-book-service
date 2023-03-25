@@ -1,26 +1,21 @@
 package se.nt1dc.bookservice.service
 
 import org.springframework.stereotype.Service
-import se.nt1dc.bookservice.dto.BookIdWithCount
-import se.nt1dc.bookservice.dto.BookWithCount
 import se.nt1dc.bookservice.entity.Item
 import se.nt1dc.bookservice.repository.BookRepository
 
 @Service
 class ItemService(val bookRepository: BookRepository) {
-    fun findItemsByBookIdList(books: MutableList<BookIdWithCount>): MutableList<Item>? {
-        val items = books.stream().map { bookIdWithCount ->
-            val book = bookRepository.findById(bookIdWithCount.bookId).orElseThrow { throw RuntimeException() }
-            BookWithCount(
-                book,
-                bookIdWithCount.count
+    fun findItemsByBookIdList(booksIds: MutableList<Int>?): MutableList<Item>? {
+        val itemList = booksIds?.groupingBy { it }?.eachCount()?.map {
+            val book = bookRepository.findById(it.key).orElseThrow { throw RuntimeException() }
+            val itemMutableList =
+                book.physicalBook.items.stream().filter { item -> item.available }.limit(it.value.toLong()).toList()
+            if (itemMutableList.size < it.value) throw RuntimeException(
+                book.name + " доступно только " + itemMutableList.size + " из" + it.value
             )
-        }.map { bookWithCount ->
-            if (bookWithCount.book.items.size < bookWithCount.count) throw RuntimeException(
-                bookWithCount.book.name + " доступно только " + bookWithCount.book.items.size + " из" + bookWithCount.count
-            )
-            bookWithCount.book.items.stream().filter { it.available }.limit(bookWithCount.count.toLong())
-        }.flatMap { it }.toList()
-        return items
+            itemMutableList
+        }?.flatten()?.toMutableList()
+        return itemList
     }
 }

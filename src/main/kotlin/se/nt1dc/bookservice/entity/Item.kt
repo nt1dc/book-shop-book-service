@@ -8,7 +8,7 @@ data class Item(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int,
     @ManyToOne
-    val book: Book,
+    val physicalBook: PhysicalBook,
     @ManyToOne
     @JoinColumn(name = "stock_id")
     val stock: Stock,

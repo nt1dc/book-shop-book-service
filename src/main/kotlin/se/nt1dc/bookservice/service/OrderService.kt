@@ -10,46 +10,53 @@ import se.nt1dc.bookservice.dto.CreatePaymentOrderResp
 import se.nt1dc.bookservice.dto.OrderDto
 import se.nt1dc.bookservice.entity.Order
 import se.nt1dc.bookservice.entity.OrderStatus
+import se.nt1dc.bookservice.entity.PaymentStatus
 import se.nt1dc.bookservice.repository.OrderRepository
 import se.nt1dc.bookservice.repository.UserRepository
+import java.util.*
 
 @Service
 class OrderService(
-    val shippingService: ShippingService,
     val requestSender: RequestSender,
+    val orderRepository: OrderRepository,
+    val objectMapper: ObjectMapper = ObjectMapper(),
+    val digitalBooksService: DigitalBooksService,
     val userRepository: UserRepository,
     val itemService: ItemService,
-    val orderRepository: OrderRepository,
-    val objectMapper: ObjectMapper = ObjectMapper()
+    val shippingService: ShippingService,
+    val physicalOrderService: PhysicalOrderService
 ) {
 
     @Value("\${apiGatewayAddress}")
     lateinit var apiGateWayAddress: String
+    val shopPaymentAccountId: Int = 1
 
-    fun createOrder(orderDto: OrderDto, userId: Int): Int? {
-        val user = userRepository.findById(userId).orElseThrow { RuntimeException("user not found") }
-        val items = itemService.findItemsByBookIdList(orderDto.bookOrderList)
-        val shippingPrice = shippingService.calculateShipping(items, orderDto.to)
-        val booksPrice = items?.stream()?.mapToDouble { it.book.price }?.sum()
+    fun createOrder(orderDto: OrderDto): Int? {
+        val user = userRepository.findById(orderDto.userId).orElseThrow { RuntimeException("user not found") }
+        val digitalBooks = digitalBooksService.findBooksByIds(orderDto.digitalOrder?.digitalBooksIds)
+        val items = itemService.findItemsByBookIdList(orderDto.physicalOrder?.physicalBooksIds)
+        val physicalBooksWithDeliveryPrice = physicalOrderService.calculateTotalPrice(items, orderDto.physicalOrder?.to)
+
+        val digitalBooksPrice = digitalBooks?.stream()?.mapToDouble { it.price }?.sum()
+        val totalPrice = digitalBooksPrice?.plus(physicalBooksWithDeliveryPrice!!)
 
         val responseEntity = requestSender.sendReq(
-            "/payment-service/payment/create",
-            CreatePaymentOrderReq((shippingPrice?.plus(booksPrice!!)), 1),
-            HttpMethod.POST
+            "/payment-service/payment/create", CreatePaymentOrderReq(totalPrice, shopPaymentAccountId), HttpMethod.POST
         )
         if (!responseEntity.statusCode.is2xxSuccessful) throw RuntimeException("проблема создания платежа")
         val createPaymentOrderResp = objectMapper.readValue(responseEntity.body, CreatePaymentOrderResp::class.java)
         val order = Order(
             status = OrderStatus.CREATED,
-            items = items!!,
+            items = items,
             user = user,
-            paymentId = createPaymentOrderResp.paymentOrderId
+            paymentId = createPaymentOrderResp.paymentOrderId,
+            digitalBooks = digitalBooks
         )
         orderRepository.save(order)
         user.orders.add(
             order
         )
-        items.stream().forEach { it.available = false }
+        items?.stream()?.forEach { it.available = false }
         val saveAndFlush = userRepository.saveAndFlush(user)
         return saveAndFlush.id
     }
@@ -62,8 +69,15 @@ class OrderService(
     fun updateStatus(orderId: Int) {
         val order = orderRepository.findById(orderId).orElseThrow { RuntimeException("order not found") }
         val sendReqWithoutBody =
-            requestSender.sendReqWithoutBody("payment-serive/payment/status".plus(order.paymentId), GET)
+            requestSender.sendReqWithoutBody("/payment-service/payment/status/".plus(order.paymentId), GET)
         if (!sendReqWithoutBody.statusCode.is2xxSuccessful) throw RuntimeException("getting status Error")
-        order.status = OrderStatus.valueOf(sendReqWithoutBody.body.toString())
+
+        val newOrderStatus =
+            OrderStatus.valueOf(objectMapper.readValue(sendReqWithoutBody.body, PaymentStatus::class.java).toString())
+        if (order.status != newOrderStatus) {
+            order.status = newOrderStatus
+            if (newOrderStatus == OrderStatus.PAYED) order.digitalBooks?.let { order.user.digitalBooks.addAll(it) }
+        }
+        orderRepository.save(order)
     }
 }

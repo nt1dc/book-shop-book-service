@@ -1,11 +1,6 @@
 package se.nt1dc.bookservice.entity
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "\"user\"")
@@ -15,5 +10,7 @@ data class User(
     var id: Int,
     var email: String,
     @OneToMany(mappedBy = "user")
-    var orders: MutableList<Order>
+    var orders: MutableList<Order>,
+    @ManyToMany
+    var digitalBooks: MutableList<DigitalBook> = mutableListOf()
 )

@@ -1,6 +1,7 @@
 package se.nt1dc.bookservice.entity
 
 import jakarta.persistence.*
+import java.util.Date
 
 @Entity
 @Table(name = "\"order\"")
@@ -13,9 +14,14 @@ data class Order(
     var status: OrderStatus,
     @OneToMany(cascade = [CascadeType.ALL])
     @JoinColumn(name = "\"order_id\"")
-    var items: MutableList<Item>,
-    @ManyToOne()
+    var items: MutableList<Item>?,
+
+    @ManyToMany
+    var digitalBooks: MutableList<DigitalBook>?,
+
+    @ManyToOne
     @JoinColumn(name = "user_id")
     var user: User,
-    var paymentId: Int
+    var paymentId: Int,
+    var creationDate: Date = Date()
 )

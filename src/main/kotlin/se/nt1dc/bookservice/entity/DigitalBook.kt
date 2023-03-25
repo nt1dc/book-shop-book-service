@@ -4,20 +4,20 @@ import jakarta.persistence.*
 import org.hibernate.Hibernate
 
 @Entity
-data class Book(
+data class DigitalBook(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Int,
-    var name: String,
-    @OneToOne(mappedBy = "book")
-    var digitalBook: DigitalBook,
-    @OneToOne(mappedBy = "book")
-    var physicalBook: PhysicalBook
+    var id: Int? = null,
+    var price: Double,
+    var downloadLink: String,
+    @OneToOne()
+    @JoinColumn(name = "book_id")
+    var book: Book
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-        other as Book
+        other as DigitalBook
 
         return id != null && id == other.id
     }
@@ -26,6 +26,6 @@ data class Book(
 
     @Override
     override fun toString(): String {
-        return this::class.simpleName + "(id = $id , name = $name , digitalBook = $digitalBook , physicalBook = $physicalBook )"
+        return this::class.simpleName + "(id = $id , price = $price , downloadLink = $downloadLink , book = $book )"
     }
 }

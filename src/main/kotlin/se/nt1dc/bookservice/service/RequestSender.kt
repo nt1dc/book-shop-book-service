@@ -10,12 +10,17 @@ import java.net.URI
 
 @Service
 class RequestSender {
-    val restTemplate: RestTemplate = RestTemplate()
+    private val restTemplate: RestTemplate = RestTemplate()
 
     @Value("\${apiGatewayAddress}")
     lateinit var apiGateWayAddress: String
     fun sendReq(url: String, body: Any?, httpMethod: HttpMethod): ResponseEntity<String> {
-        return restTemplate.exchange(URI(apiGateWayAddress + url), httpMethod, HttpEntity(body as Any), String::class.java)
+        return restTemplate.exchange(
+            URI(apiGateWayAddress + url),
+            httpMethod,
+            HttpEntity(body as Any),
+            String::class.java
+        )
     }
 
     fun sendReqWithoutBody(url: String, httpMethod: HttpMethod): ResponseEntity<String> {

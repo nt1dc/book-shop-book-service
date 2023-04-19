@@ -26,7 +26,7 @@ class OrderService(
     val itemService: ItemService,
     val shippingService: ShippingService,
     val physicalOrderService: PhysicalOrderService,
-    val userService: UserService
+    val userService: UserService,
     val tokenUtils: TokenUtils
 ) {
 

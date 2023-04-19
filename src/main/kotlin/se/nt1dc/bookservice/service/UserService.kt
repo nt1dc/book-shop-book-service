@@ -2,6 +2,7 @@ package se.nt1dc.bookservice.service
 
 import org.springframework.stereotype.Service
 import se.nt1dc.bookservice.dto.DigitalBookResponse
+import se.nt1dc.bookservice.dto.UserCreationRequest
 import se.nt1dc.bookservice.entity.User
 import se.nt1dc.bookservice.repository.UserRepository
 
@@ -12,7 +13,20 @@ class UserService(private val userRepository: UserRepository) {
             .map { DigitalBookResponse(it.book.name, it.downloadLink) }.toList()
     }
 
-    fun getUserById(userId: Int): User? {
+    fun getUserById(userId: Int): User {
         return userRepository.findById(userId).orElseThrow { RuntimeException("user not found") }
+    }
+
+    fun getUserByName(login: String): User {
+        return userRepository.findByLogin(login).orElseThrow { RuntimeException("user not found") }
+
+    }
+
+    fun createUser(userCreationRequest: UserCreationRequest) {
+        userRepository.save(
+            User(
+                login = userCreationRequest.login
+            )
+        )
     }
 }

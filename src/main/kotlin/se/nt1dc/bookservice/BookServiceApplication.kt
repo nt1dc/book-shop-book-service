@@ -11,3 +11,4 @@ class BookServiceApplication
 fun main(args: Array<String>) {
     runApplication<BookServiceApplication>(*args)
 }
+

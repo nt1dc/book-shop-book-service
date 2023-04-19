@@ -1,6 +1,7 @@
 package se.nt1dc.bookservice.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpMethod.GET
@@ -24,19 +25,20 @@ class OrderService(
     val userRepository: UserRepository,
     val itemService: ItemService,
     val shippingService: ShippingService,
-    val physicalOrderService: PhysicalOrderService
+    val physicalOrderService: PhysicalOrderService,
+    val userService: UserService
+    val tokenUtils: TokenUtils
 ) {
 
     @Value("\${apiGatewayAddress}")
     lateinit var apiGateWayAddress: String
     val shopPaymentAccountId: Int = 1
 
-    fun createOrder(orderDto: OrderDto): Int? {
-        val user = userRepository.findById(orderDto.userId).orElseThrow { RuntimeException("user not found") }
+    fun createOrder(orderDto: OrderDto, httpServletRequest: HttpServletRequest): Int? {
+        val user = userService.getUserByName(tokenUtils.extractUserNameFromToken(httpServletRequest))
         val digitalBooks = digitalBooksService.findBooksByIds(orderDto.digitalOrder?.digitalBooksIds)
         val items = itemService.findItemsByBookIdList(orderDto.physicalOrder?.physicalBooksIds)
         val physicalBooksWithDeliveryPrice = physicalOrderService.calculateTotalPrice(items, orderDto.physicalOrder?.to)
-
         val digitalBooksPrice = digitalBooks?.stream()?.mapToDouble { it.price }?.sum()
         val totalPrice = digitalBooksPrice?.plus(physicalBooksWithDeliveryPrice!!)
 

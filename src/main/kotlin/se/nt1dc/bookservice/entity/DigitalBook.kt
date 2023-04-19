@@ -3,6 +3,7 @@ package se.nt1dc.bookservice.entity
 import jakarta.persistence.*
 import org.hibernate.Hibernate
 
+//DDD Эрик Эвонс
 @Entity
 data class DigitalBook(
     @Id

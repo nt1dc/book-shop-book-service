@@ -7,10 +7,10 @@ import jakarta.persistence.*
 data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Int,
-    var email: String,
+    var id: Int? = null,
+    var login: String,
     @OneToMany(mappedBy = "user")
-    var orders: MutableList<Order>,
+    var orders: MutableList<Order> = mutableListOf(),
     @ManyToMany
-    var digitalBooks: MutableList<DigitalBook> = mutableListOf()
+    var digitalBooks: MutableList<DigitalBook> = mutableListOf(),
 )

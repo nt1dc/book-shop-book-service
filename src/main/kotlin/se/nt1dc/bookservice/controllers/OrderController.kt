@@ -1,6 +1,6 @@
 package se.nt1dc.bookservice.controllers
 
-import jakarta.validation.constraints.NotNull
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.web.bind.annotation.*
 import se.nt1dc.bookservice.dto.OrderDto
 import se.nt1dc.bookservice.service.OrderService
@@ -13,8 +13,8 @@ class OrderController(
 
 
     @PostMapping("")
-    fun createOrder(@RequestBody  orderDto: OrderDto): Int? {
-        return orderService.createOrder(orderDto);
+    fun createOrder(@RequestBody orderDto: OrderDto, httpServletRequest: HttpServletRequest): Int? {
+        return orderService.createOrder(orderDto,httpServletRequest);
     }
 
     @GetMapping("/pay/{orderId}")

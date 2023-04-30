@@ -18,7 +18,7 @@ class UserService(private val userRepository: UserRepository) {
     }
 
     fun getUserByName(login: String): User {
-        return userRepository.findByLogin(login).orElseThrow { RuntimeException("user not found") }
+        return userRepository.findByLogin(login).orElseThrow { RuntimeException("user $login not found") }
     }
 
     fun createUser(userCreationRequest: UserCreationRequest) {

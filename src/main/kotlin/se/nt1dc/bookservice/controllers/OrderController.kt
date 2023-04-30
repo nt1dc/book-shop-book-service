@@ -13,8 +13,8 @@ class OrderController(
 
 
     @PostMapping("")
-    fun createOrder(@RequestBody orderDto: OrderDto, httpServletRequest: HttpServletRequest): Int? {
-        return orderService.createOrder(orderDto,httpServletRequest);
+    fun createOrder(@RequestBody orderDto: OrderDto, @RequestHeader(value = "login") login: String): Int? {
+        return orderService.createOrder(orderDto, login);
     }
 
     @GetMapping("/pay/{orderId}")

@@ -27,7 +27,7 @@ class ShippingServiceImpl(
             )
         }?.toList()
         val shipPriceSumResponse =
-            requestSender.sendReq("/delivery-service/calculate", ItemShippingReq(itemShipRequest), HttpMethod.POST)
+            requestSender.sendReq("delivery-service/calculate", ItemShippingReq(itemShipRequest), HttpMethod.POST)
         if (shipPriceSumResponse.statusCode.is2xxSuccessful) return shipPriceSumResponse.body?.toDouble()
         throw ForeingServerRequestException(shipPriceSumResponse)
     }

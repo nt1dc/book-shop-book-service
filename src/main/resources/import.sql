@@ -1,4 +1,4 @@
-INSERT INTO "user" (login) values ('test@test.test');
+INSERT INTO "users" (login) values ('test@test.test');
 INSERT INTO book  (name) VALUES ( 'ЛЯГУШКИ И ЕЕ ПОДВИДЫ');
 INSERT INTO "digital_book" (download_link, price, book_id) VALUES ('https://drive.google.com/uc?export=download&id=1XNUWq09UMsUJEpu0zhpWiVqEz2yuFevO',666.66,1);
 INSERT INTO location (latitude, longitude) VALUES (59.95718399052891, 30.308317588334006);

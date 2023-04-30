@@ -1,7 +1,6 @@
 package se.nt1dc.bookservice.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpMethod.GET
@@ -24,18 +23,14 @@ class OrderService(
     val digitalBooksService: DigitalBooksService,
     val userRepository: UserRepository,
     val itemService: ItemService,
-    val shippingService: ShippingService,
     val physicalOrderService: PhysicalOrderService,
     val userService: UserService,
-    val tokenUtils: TokenUtils
 ) {
 
-    @Value("\${apiGatewayAddress}")
-    lateinit var apiGateWayAddress: String
     val shopPaymentAccountId: Int = 1
 
-    fun createOrder(orderDto: OrderDto, httpServletRequest: HttpServletRequest): Int? {
-        val user = userService.getUserByName(tokenUtils.extractUserNameFromToken(httpServletRequest))
+    fun createOrder(orderDto: OrderDto, login: String): Int? {
+        val user = userService.getUserByName(login)
         val digitalBooks = digitalBooksService.findBooksByIds(orderDto.digitalOrder?.digitalBooksIds)
         val items = itemService.findItemsByBookIdList(orderDto.physicalOrder?.physicalBooksIds)
         val physicalBooksWithDeliveryPrice = physicalOrderService.calculateTotalPrice(items, orderDto.physicalOrder?.to)
@@ -43,7 +38,7 @@ class OrderService(
         val totalPrice = digitalBooksPrice?.plus(physicalBooksWithDeliveryPrice!!)
 
         val responseEntity = requestSender.sendReq(
-            "/payment-service/payment/create", CreatePaymentOrderReq(totalPrice, shopPaymentAccountId), HttpMethod.POST
+            "payment-service/payment/create", CreatePaymentOrderReq(totalPrice, shopPaymentAccountId), HttpMethod.POST
         )
         if (!responseEntity.statusCode.is2xxSuccessful) throw RuntimeException("проблема создания платежа")
         val createPaymentOrderResp = objectMapper.readValue(responseEntity.body, CreatePaymentOrderResp::class.java)
@@ -59,13 +54,13 @@ class OrderService(
             order
         )
         items?.stream()?.forEach { it.available = false }
-        val saveAndFlush = userRepository.saveAndFlush(user)
-        return saveAndFlush.id
+        userRepository.saveAndFlush(user)
+        return order.id
     }
 
     fun pay(orderId: Int): String {
         val order = orderRepository.findById(orderId).orElseThrow { RuntimeException("order not found") }
-        return apiGateWayAddress + "/payment-service/payment/pay/" + order.paymentId
+        return "http://" + "payment-service/payment/pay/" + order.paymentId
     }
 
     fun updateStatus(orderId: Int) {

@@ -1,4 +1,4 @@
-package se.nt1dc.bookservice.dto
+package se.nt1dc.bookservice.dto.payment
 
 data class CreatePaymentOrderReq(
     var paymentSum: Double?,

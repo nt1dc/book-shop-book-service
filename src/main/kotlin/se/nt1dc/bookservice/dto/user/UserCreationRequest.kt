@@ -1,4 +1,4 @@
-package se.nt1dc.bookservice.dto
+package se.nt1dc.bookservice.dto.user
 
 
 data class UserCreationRequest(

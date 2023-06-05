@@ -1,5 +1,6 @@
 package se.nt1dc.bookservice.controllers
 
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -7,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import se.nt1dc.bookservice.dto.DigitalBookResponse
-import se.nt1dc.bookservice.dto.UserCreationRequest
+import se.nt1dc.bookservice.dto.user.UserCreationRequest
 import se.nt1dc.bookservice.entity.User
 import se.nt1dc.bookservice.service.UserService
 
@@ -28,5 +29,10 @@ class UserController(val userService: UserService) {
     @PostMapping()
     fun createUser(@RequestBody userCreationRequest: UserCreationRequest) {
         userService.createUser(userCreationRequest)
+    }
+
+    @DeleteMapping("/{login}")
+    fun deleteUser(@PathVariable login: String) {
+        userService.deleteUserByLogin(login);
     }
 }

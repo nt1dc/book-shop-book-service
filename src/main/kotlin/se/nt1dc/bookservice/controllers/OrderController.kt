@@ -1,7 +1,7 @@
 package se.nt1dc.bookservice.controllers
 
 import org.springframework.web.bind.annotation.*
-import se.nt1dc.bookservice.dto.OrderDto
+import se.nt1dc.bookservice.dto.order.OrderDto
 import se.nt1dc.bookservice.service.OrderService
 
 @RestController

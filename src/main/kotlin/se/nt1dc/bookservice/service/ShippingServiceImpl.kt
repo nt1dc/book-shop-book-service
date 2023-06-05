@@ -3,8 +3,8 @@ package se.nt1dc.bookservice.service
 import jakarta.transaction.Transactional
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
-import se.nt1dc.bookservice.dto.ItemShippingDto
-import se.nt1dc.bookservice.dto.ItemShippingReq
+import se.nt1dc.bookservice.dto.shipping.ItemShippingDto
+import se.nt1dc.bookservice.dto.shipping.ItemShippingReq
 import se.nt1dc.bookservice.exceptions.ForeingServerRequestException
 import se.nt1dc.bookservice.dto.LocationDto
 import se.nt1dc.bookservice.entity.Item

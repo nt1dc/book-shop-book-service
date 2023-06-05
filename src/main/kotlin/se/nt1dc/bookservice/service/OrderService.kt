@@ -1,21 +1,24 @@
 package se.nt1dc.bookservice.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.netflix.discovery.EurekaClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpMethod.DELETE
 import org.springframework.http.HttpMethod.GET
 import org.springframework.stereotype.Service
-import se.nt1dc.bookservice.dto.CreatePaymentOrderReq
-import se.nt1dc.bookservice.dto.CreatePaymentOrderResp
-import se.nt1dc.bookservice.dto.OrderDto
+import org.springframework.transaction.annotation.Transactional
+import se.nt1dc.bookservice.dto.order.OrderDto
+import se.nt1dc.bookservice.dto.payment.CreatePaymentOrderReq
+import se.nt1dc.bookservice.dto.payment.CreatePaymentOrderResp
 import se.nt1dc.bookservice.entity.Order
 import se.nt1dc.bookservice.entity.OrderStatus
 import se.nt1dc.bookservice.entity.PaymentStatus
 import se.nt1dc.bookservice.repository.OrderRepository
 import se.nt1dc.bookservice.repository.UserRepository
-import java.util.*
 
 @Service
+@Transactional
 class OrderService(
     val requestSender: RequestSender,
     val orderRepository: OrderRepository,
@@ -27,6 +30,8 @@ class OrderService(
     val userService: UserService,
 ) {
 
+    @Value("\${eureka.client.service.defaultZone}")
+    lateinit var apiGatewayAddress: String
     val shopPaymentAccountId: Int = 1
 
     fun createOrder(orderDto: OrderDto, login: String): Int? {
@@ -42,25 +47,29 @@ class OrderService(
         )
         if (!responseEntity.statusCode.is2xxSuccessful) throw RuntimeException("проблема создания платежа")
         val createPaymentOrderResp = objectMapper.readValue(responseEntity.body, CreatePaymentOrderResp::class.java)
-        val order = Order(
-            status = OrderStatus.CREATED,
-            items = items,
-            user = user,
-            paymentId = createPaymentOrderResp.paymentOrderId,
-            digitalBooks = digitalBooks
-        )
-        orderRepository.save(order)
-        user.orders.add(
-            order
-        )
-        items?.stream()?.forEach { it.available = false }
-        userRepository.saveAndFlush(user)
-        return order.id
+        try {
+            val order = Order(
+                status = OrderStatus.CREATED,
+                items = items,
+                user = user,
+                paymentId = createPaymentOrderResp.paymentOrderId,
+                digitalBooks = digitalBooks
+            )
+            orderRepository.save(order)
+            user.orders.add(order)
+            items?.stream()?.forEach { it.available = false }
+
+            userRepository.saveAndFlush(user)
+            return order.id
+        } catch (e: RuntimeException) {
+            requestSender.sendReqWithoutBody("payment-service/payment/${createPaymentOrderResp.paymentOrderId}", DELETE)
+        }
+        throw throw RuntimeException("проблема создания платежа")
     }
 
     fun pay(orderId: Int): String {
         val order = orderRepository.findById(orderId).orElseThrow { RuntimeException("order not found") }
-        return "http://" + "payment-service/payment/pay/" + order.paymentId
+        return "http://" + "$apiGatewayAddress." + "payment-service/payment/pay/" + order.paymentId
     }
 
     fun updateStatus(orderId: Int) {

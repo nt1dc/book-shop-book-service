@@ -2,7 +2,7 @@ package se.nt1dc.bookservice.service
 
 import org.springframework.stereotype.Service
 import se.nt1dc.bookservice.dto.DigitalBookResponse
-import se.nt1dc.bookservice.dto.UserCreationRequest
+import se.nt1dc.bookservice.dto.user.UserCreationRequest
 import se.nt1dc.bookservice.entity.User
 import se.nt1dc.bookservice.repository.UserRepository
 
@@ -27,5 +27,9 @@ class UserService(private val userRepository: UserRepository) {
                 login = userCreationRequest.login
             )
         )
+    }
+
+    fun deleteUserByLogin(login: String) {
+        userRepository.deleteByLogin(login)
     }
 }

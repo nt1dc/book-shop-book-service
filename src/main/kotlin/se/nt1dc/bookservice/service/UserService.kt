@@ -27,6 +27,15 @@ class UserService(private val userRepository: UserRepository) {
                 login = userCreationRequest.login
             )
         )
+//        val avroRecord = Avro.default.toRecord(
+//            UserGreetingsEmail.serializer(),
+//            UserGreetingsEmail(userCreationRequest.login, "welcome idiot!")
+//        )
+//        kafka.send(
+//            "stock-purchases",
+//            "user",
+//            avroRecord // <-- (3)
+//        )
     }
 
     fun deleteUserByLogin(login: String) {

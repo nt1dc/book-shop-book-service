@@ -1,6 +1,16 @@
 server:
   port: 8087
 spring:
+  kafka:
+    bootstrap-servers: "localhost:9091"
+    producer:
+      keySerializer: "org.apache.kafka.common.serialization.StringSerializer"
+      valueSerializer: "io.confluent.kafka.serializers.KafkaAvroSerializer"
+      properties:
+        schema:
+          registry:
+            url: "http://localhost:8085"
+        specific.avro.reader: true
   application:
     name: book-service
   datasource:
@@ -18,9 +28,3 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8081/eureka
-
-logging:
-  level:
-    org.hibernate:
-      SQL: DEBUG
-      type: TRACE

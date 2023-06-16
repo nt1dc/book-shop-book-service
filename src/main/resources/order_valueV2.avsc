@@ -1,0 +1,17 @@
+//{
+//  "namespace": "se.nt1dc.avro.orders",
+//  "type": "record",
+//  "name": "OrderValue",
+//  "version": 2,
+//  "fields": [
+//    {
+//      "name": "id",
+//      "type": "string"
+//    },
+//    {
+//      "name": "newField",
+//      "type": "string",
+//      "default": ""
+//    }
+//  ]
+//}

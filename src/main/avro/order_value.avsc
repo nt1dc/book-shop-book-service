@@ -1,0 +1,8 @@
+{
+  "namespace": "se.nt1dc.avro.orders",
+  "type": "record",
+  "name": "OrderValue",
+  "fields": [
+    { "name": "id", "type": "string"}
+  ]
+}

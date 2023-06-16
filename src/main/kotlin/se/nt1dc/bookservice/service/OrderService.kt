@@ -30,8 +30,7 @@ class OrderService(
     val userService: UserService,
 ) {
 
-    @Value("\${eureka.client.service.defaultZone}")
-    lateinit var apiGatewayAddress: String
+    var apiGatewayAddress: String = ""
     val shopPaymentAccountId: Int = 1
 
     fun createOrder(orderDto: OrderDto, login: String): Int? {

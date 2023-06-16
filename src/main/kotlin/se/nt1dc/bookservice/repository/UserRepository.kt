@@ -7,4 +7,5 @@ import java.util.*
 interface UserRepository : JpaRepository<User, Int> {
     fun findByLogin(login: String): Optional<User>
     fun deleteByLogin(login: String)
+    fun findAllByRegistrationDateBetween(from: Date, to: Date): List<User>
 }

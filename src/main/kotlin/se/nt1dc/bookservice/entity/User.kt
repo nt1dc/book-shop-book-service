@@ -2,6 +2,7 @@ package se.nt1dc.bookservice.entity
 
 import jakarta.persistence.*
 import org.hibernate.Hibernate
+import java.util.Date
 
 @Entity
 @Table(name = "users")
@@ -14,6 +15,7 @@ data class User(
     var orders: MutableList<Order> = mutableListOf(),
     @ManyToMany
     var digitalBooks: MutableList<DigitalBook> = mutableListOf(),
+    var registrationDate: Date = Date()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

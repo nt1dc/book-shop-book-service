@@ -1,0 +1,19 @@
+{
+  "namespace": "se.nt1dc.avro.users",
+  "type": "record",
+  "name": "NewUsersInfo",
+  "fields": [
+    {
+      "name": "dateFrom",
+      "type": "string"
+    },
+    {
+      "name": "dateTo",
+      "type": "string"
+    },
+    {
+      "name": "count",
+      "type": "int"
+    }
+  ]
+}
